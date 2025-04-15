@@ -13,6 +13,11 @@ import ReactFlow, {
   MarkerType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import CustomNode from './CustomNode';
+
+const nodeTypes = {
+  custom: CustomNode,
+};
 
 let id = 0;
 const getId = () => `node_${id++}`;
@@ -46,16 +51,9 @@ function FlowEditor() {
   const addNode = () => {
     const newNode = {
       id: getId(),
+      type: 'custom',
       data: { label: `Box ${id}` },
-      position: { x: Math.random() * 50, y: Math.random() * 50 },
-      style: {
-        width: 60,
-        height: 32,
-        border: '1px solid #555',
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#f9f9f9',
-      },
+      position: { x: Math.random() * 100, y: Math.random() * 100 },
     };
     setNodes((nds) => nds.concat(newNode));
   };
@@ -157,6 +155,7 @@ function FlowEditor() {
       <div style={{ flex: 1 }}>
         <ReactFlowProvider>
           <ReactFlow
+            nodeTypes={{ custom: CustomNode }}
             nodes={nodes}
             edges={edges}
             onConnect={onConnect}
