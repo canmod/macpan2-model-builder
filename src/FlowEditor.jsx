@@ -47,7 +47,7 @@ function FlowEditor() {
     const newNode = {
       id: getId(),
       data: { label: `Box ${id}` },
-      position: { x: 0, y: 0 },
+      position: { x: Math.random() * 50, y: Math.random() * 50 },
       style: {
         width: 60,
         height: 32,
