@@ -116,11 +116,30 @@ function FlowEditor() {
     setModelCode(code);
   };
 
+  useEffect(() => {
+    const flows = edges.map((e) => {
+      const from = nodes.find((n) => n.id === e.source)?.data.label || e.source;
+      const to = nodes.find((n) => n.id === e.target)?.data.label || e.target;
+      const rate = e.label || 'RATE';
+      const name = e.data?.name || 'unnamed_flow';
+      return `  mp_per_capita_flow(from = "${from}", to = "${to}", rate = "${rate}", abs_rate = "${name}")`;
+    });
+  
+    const code = [
+      'mp_tmb_model_spec(during = list(',
+      flows.join(',\n'),
+      '))',
+    ].join('\n');
+  
+    setModelCode(code);
+  }, [nodes, edges]);
+  
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button onClick={addNode}>Add Compartment</button>
-        <button onClick={generateModelCode}>Generate R Code</button>
+        {/*<button onClick={generateModelCode}>Generate R Code</button>*/}
         {selectedElement && 'source' in selectedElement && (
           <>
             <select
