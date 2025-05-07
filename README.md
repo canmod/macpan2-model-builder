@@ -12,3 +12,10 @@ Prototype visual builder for compartmental models using [React Flow](https://rea
 npm install
 npm run dev
 ```
+
+## Deployment
+
+```bash
+npm run build
+npm run deploy
+```
