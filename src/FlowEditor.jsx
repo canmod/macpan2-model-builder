@@ -1,4 +1,3 @@
-
 // React + Vite + React Flow scaffold
 
 import React, { useCallback, useState, useEffect, useRef } from 'react';
@@ -14,6 +13,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
+import { parse } from 'mathjs';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -22,6 +22,39 @@ const nodeTypes = {
 let id = 0;
 const getId = () => `node_${id++}`;
 
+function getStateDependenceFrame(nodes, edges) {
+  const compartments = new Set(nodes.map(n => n.data?.label).filter(Boolean));
+  const rows = [];
+
+  for (const edge of edges) {
+    const toNode = nodes.find(n => n.id === edge.target);
+    const toLabel = toNode?.data?.label;
+    const flowName = edge.data?.name || 'unnamed_flow';
+    const rateExpr = edge.label || '';
+
+    if (!toLabel || !rateExpr) continue;
+
+    let varsInRate;
+    try {
+      const ast = parse(rateExpr);
+      varsInRate = ast
+        .filter(node => node.isSymbolNode)
+        .map(node => node.name);
+    } catch (e) {
+      console.warn(`Invalid rate expression: "${rateExpr}"`);
+      varsInRate = [];
+    }
+
+    for (const v of varsInRate) {
+      if (compartments.has(v)) {
+        rows.push({ state: v, flow: flowName });
+      }
+    }
+  }
+
+  return rows;
+}
+
 function FlowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -29,6 +62,7 @@ function FlowEditor() {
   const [inputValue, setInputValue] = useState('');
   const [labelType, setLabelType] = useState('label');
   const [modelCode, setModelCode] = useState('');
+  const [stateFrame, setStateFrame] = useState([]);
 
   const inputRef = useRef(null);
 
@@ -66,14 +100,12 @@ function FlowEditor() {
   useEffect(() => {
     if (!selectedElement) return;
     if ('source' in selectedElement) {
-      // edge
       if (labelType === 'label') {
         setInputValue(selectedElement.label || '');
       } else {
         setInputValue(selectedElement.data?.name || '');
       }
     } else {
-      // node
       setInputValue(selectedElement.data?.label || '');
     }
   }, [selectedElement, labelType]);
@@ -81,7 +113,6 @@ function FlowEditor() {
   const updateLabel = () => {
     if (!selectedElement) return;
     if ('source' in selectedElement) {
-      // edge
       setEdges((eds) =>
         eds.map((e) => {
           if (e.id === selectedElement.id) {
@@ -93,7 +124,6 @@ function FlowEditor() {
         })
       );
     } else {
-      // node
       setNodes((nds) =>
         nds.map((n) =>
           n.id === selectedElement.id ? { ...n, data: { ...n.data, label: inputValue } } : n
@@ -110,22 +140,22 @@ function FlowEditor() {
       const name = e.data?.name || 'unnamed_flow';
       return `  mp_per_capita_flow(from = "${from}", to = "${to}", rate = "${rate}", abs_rate = "${name}")`;
     });
-  
+
     const code = [
       'mp_tmb_model_spec(during = list(',
       flows.join(',\n'),
       '))',
     ].join('\n');
-  
+
     setModelCode(code);
+    const rows = getStateDependenceFrame(nodes, edges);
+    setStateFrame(rows);
   }, [nodes, edges]);
-  
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button onClick={addNode}>Add Compartment</button>
-        {/*<button onClick={generateModelCode}>Generate R Code</button>*/}
         {selectedElement && 'source' in selectedElement && (
           <>
             <select
@@ -180,6 +210,30 @@ function FlowEditor() {
         <pre style={{ background: '#f0f0f0', padding: '10px', whiteSpace: 'pre-wrap' }}>
           {modelCode}
         </pre>
+      )}
+
+      {stateFrame.length > 0 && (
+        <div style={{ maxHeight: '200px', overflow: 'auto', padding: '10px', fontSize: '0.9em' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>State dependence:</div>
+          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+            <thead>
+              <tr>
+                {Object.keys(stateFrame[0]).map((col) => (
+                  <th key={col} style={{ border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' }}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {stateFrame.map((row, i) => (
+                <tr key={i}>
+                  {Object.values(row).map((val, j) => (
+                    <td key={j} style={{ border: '1px solid #ccc', padding: '4px' }}>{String(val)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
