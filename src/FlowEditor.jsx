@@ -102,20 +102,6 @@ function FlowEditor() {
     }
   };
 
-  const generateModelCode = () => {
-    const flows = edges.map((e) => {
-      const from = nodes.find((n) => n.id === e.source)?.data.label || e.source;
-      const to = nodes.find((n) => n.id === e.target)?.data.label || e.target;
-      const rate = e.label || 'RATE';
-      const name = e.data?.name || 'unnamed_flow';
-      return `  mp_per_capita_flow(from = "${from}", to = "${to}", rate = "${rate}", abs_rate = "${name}")`;
-    });
-    const code = [
-      'mp_tmb_model_spec(during = list(',flows.join(',\n'),'))'].join('\n');
-    
-    setModelCode(code);
-  };
-
   useEffect(() => {
     const flows = edges.map((e) => {
       const from = nodes.find((n) => n.id === e.source)?.data.label || e.source;
