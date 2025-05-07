@@ -174,7 +174,7 @@ function FlowEditor() {
       <div style={{ flex: 1 }}>
         <ReactFlowProvider>
           <ReactFlow
-            nodeTypes={{ custom: CustomNode }}
+            nodeTypes={nodeTypes}
             nodes={nodes}
             edges={edges}
             onConnect={onConnect}
