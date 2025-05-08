@@ -1,7 +1,8 @@
 // React + Vite + React Flow scaffold
 
 import React, { useCallback, useState, useEffect, useRef } from 'react';
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   useNodesState,
   useEdgesState,
@@ -9,8 +10,8 @@ import ReactFlow, {
   ReactFlowProvider,
   Background,
   MarkerType
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
 import { parse } from 'mathjs';
 
