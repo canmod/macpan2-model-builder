@@ -98,6 +98,8 @@ function FlowEditor() {
   };
 
   useEffect(() => {
+
+    // 
     if (!selectedElement) return;
     if ('source' in selectedElement) {
       if (labelType === 'label') {
@@ -133,6 +135,8 @@ function FlowEditor() {
   };
 
   useEffect(() => {
+
+    // Generate model code based on diagram
     const flows = edges.map((e) => {
       const from = nodes.find((n) => n.id === e.source)?.data.label || e.source;
       const to = nodes.find((n) => n.id === e.target)?.data.label || e.target;
@@ -140,20 +144,20 @@ function FlowEditor() {
       const name = e.data?.name || 'unnamed_flow';
       return `  mp_per_capita_flow(from = "${from}", to = "${to}", rate = "${rate}", abs_rate = "${name}")`;
     });
-
     const code = [
       'mp_tmb_model_spec(during = list(',
       flows.join(',\n'),
       '))',
     ].join('\n');
-
     setModelCode(code);
+
+    // Determine which flows depend on which compartments
     const rows = getStateDependenceFrame(nodes, edges);
     setStateFrame(rows);
   }, [nodes, edges]);
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <div style={{ padding: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button onClick={addNode}>Add Compartment</button>
         {selectedElement && 'source' in selectedElement && (
@@ -187,7 +191,7 @@ function FlowEditor() {
         )}
       </div>
 
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, position: 'relative' }}>
         <ReactFlowProvider>
           <ReactFlow
             nodeTypes={nodeTypes}
@@ -213,22 +217,22 @@ function FlowEditor() {
       )}
 
       {stateFrame.length > 0 && (
-        <div style={{ maxHeight: '200px', overflow: 'auto', padding: '10px', fontSize: '0.9em' }}>
+        <div style={{ maxHeight: '200px', overflow: 'auto', padding: '10px', fontSize: '0.9em', position: 'relative' }}>
           <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>State dependence:</div>
           <table style={{ borderCollapse: 'collapse', width: '100%' }}>
             <thead>
               <tr>
-                {Object.keys(stateFrame[0]).map((col) => (
-                  <th key={col} style={{ border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' }}>{col}</th>
-                ))}
+                <th style={{ border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' }}>Row ID</th>
+                <th style={{ border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' }}>state</th>
+                <th style={{ border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' }}>flow</th>
               </tr>
             </thead>
             <tbody>
               {stateFrame.map((row, i) => (
                 <tr key={i}>
-                  {Object.values(row).map((val, j) => (
-                    <td key={j} style={{ border: '1px solid #ccc', padding: '4px' }}>{String(val)}</td>
-                  ))}
+                  <td style={{ border: '1px solid #ccc', padding: '4px' }}>{`ref-${i}`}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '4px' }}>{row.state}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '4px' }}>{row.flow}</td>
                 </tr>
               ))}
             </tbody>
