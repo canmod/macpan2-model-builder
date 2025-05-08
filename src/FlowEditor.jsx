@@ -2,12 +2,12 @@
 
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import ReactFlow, {
-  ReactFlowProvider,
   addEdge,
-  Controls,
-  Background,
   useNodesState,
   useEdgesState,
+  Controls,
+  ReactFlowProvider,
+  Background,
   MarkerType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -270,3 +270,41 @@ function FlowEditor() {
 }
 
 export default FlowEditor;
+
+
+function DashedLinesOverlay({ stateFrame }) {
+  return (
+    <svg
+      style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        top: 0,
+        left: 0,
+      }}
+    >
+      {stateFrame.map((row, i) => {
+        const x1 = parseFloat(row.stateX);
+        const y1 = parseFloat(row.stateY);
+        const x2 = parseFloat(row.flowX);
+        const y2 = parseFloat(row.flowY);
+
+        if ([x1, y1, x2, y2].some(isNaN)) return null;
+
+        return (
+          <line
+            key={`line-${i}`}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="gray"
+            strokeWidth={1}
+            strokeDasharray="4 2"
+          />
+        );
+      })}
+    </svg>
+  );
+}
