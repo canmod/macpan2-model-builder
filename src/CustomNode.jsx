@@ -17,6 +17,7 @@ export default function CustomNode({ data }) {
         overflow: 'visible',
       }}
     >
+
       {/* Target handles */}
       <Handle type="target" position={Position.Left} id="left-target" />
       <Handle type="target" position={Position.Top} id="top-target" />

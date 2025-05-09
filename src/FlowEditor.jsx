@@ -4,6 +4,7 @@ import React, { useCallback, useState, useEffect, useRef } from 'react';
 import {
   ReactFlow,
   addEdge,
+
   useNodesState,
   useEdgesState,
   Controls,
@@ -25,15 +26,11 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-
 let id = 0;
 const getId = () => `node_${id++}`;
 
 const thStyle = { border: '1px solid #ccc', padding: '4px', background: '#f9f9f9' };
 const tdStyle = { border: '1px solid #ccc', padding: '4px' };
-
-
-
 
 function FlowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -43,6 +40,7 @@ function FlowEditor() {
   const [labelType, setLabelType] = useState('label');
   const [modelCode, setModelCode] = useState('');
   const [stateFrame, setStateFrame] = useState([]);
+  console.log('THIS', edges);
 
   const inputRef = useRef(null);
 
@@ -198,26 +196,13 @@ function FlowEditor() {
                 }}
               >
                 {stateFrame.map((row, i) => {
-                  const sx = row.stateX; //parseFloat(row.stateX);
-                  const sy = row.stateY; //parseFloat(row.stateY);
-                  const fx = row.flowX; //parseFloat(row.flowX);
-                  const fy = row.flowY; //parseFloat(row.flowY);
+                  const sx = row.stateX; 
+                  const sy = row.stateY; 
+                  const fx = row.flowX;
+                  const fy = row.flowY;
 
                   return (
                     <g key={i}>
-                
-                      {/* state position marker */}
-                      {/* <circle cx={sx} cy={sy} r={4} fill="red" />
-                      <text x={sx + 5} y={sy - 5} fontSize={10} fill="red">
-                        {row.state}
-                      </text> */}
-
-                      {/* flow position marker */}
-                      {/* <circle cx={fx} cy={fy} r={4} fill="blue" />
-                      <text x={fx + 5} y={fy - 5} fontSize={10} fill="blue">
-                        {row.flow}
-                      </text>  */}
-
                       {/* dashed line between them */}
                       <line
                         x1={sx}
@@ -233,8 +218,6 @@ function FlowEditor() {
                 })}
               </svg>
             </ViewportPortal>
-
-
           </ReactFlow>
         </ReactFlowProvider>
       </div>
@@ -247,7 +230,7 @@ function FlowEditor() {
       )}
 
       {/* State Dependence Frame */}
-      {stateFrame.length > 0 && (
+      {/* {stateFrame.length > 0 && (
         <div style={{ maxHeight: '200px', overflow: 'auto', padding: '10px', fontSize: '0.9em', position: 'relative' }}>
           <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>State dependence:</div>
           <table style={{ borderCollapse: 'collapse', width: '100%' }}>
@@ -277,7 +260,7 @@ function FlowEditor() {
           </tbody>
           </table>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

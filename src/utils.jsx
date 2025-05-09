@@ -36,7 +36,6 @@ function getHandleCoords(node, handleId) {
 function getEdgeParams(edge, fromNode, toNode) {
   const source = getHandleCoords(fromNode, edge.sourceHandle);
   const target = getHandleCoords(toNode, edge.targetHandle);
-  console.log(edge);
 
   return {
     sourceX: source.x,
@@ -60,15 +59,10 @@ export default function getStateDependenceFrame(nodes, edges) {
     const toLabel = toNode?.data?.label;
     const flowName = edge.data?.name || 'unnamed_flow';
     const rateExpr = edge.label || '';
-    console.log(edge)
-
-    //const labelX = edge.labelX;
-    //const labelY = edge.labelY;
 
     const edgeParams = getEdgeParams(edge, toNode, fromNode);
 
     const [path, labelX, labelY] = getBezierPath(edgeParams);
-    console.log('edgeParams', edgeParams, 'path', path, 'labelX', labelX, 'labelY', labelY);
     
     if (!toLabel || !rateExpr || !fromNode || !toNode) continue;
 

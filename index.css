@@ -3,3 +3,11 @@ body {
   margin: 0;
   font-family: sans-serif;
 }
+
+.react-flow__viewport-portal {
+  z-index: -1;
+}
+
+.react-flow__background {
+  z-index: -2;
+}

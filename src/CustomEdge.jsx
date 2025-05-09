@@ -1,4 +1,3 @@
-// CustomDefaultEdge.jsx
 import React from 'react';
 import { BaseEdge, getBezierPath } from '@xyflow/react';
 
@@ -12,7 +11,7 @@ export default function CustomEdge({
   targetPosition,
   markerEnd,
   label,
-  labelStyle,
+  labelStyle
 }) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -27,19 +26,33 @@ export default function CustomEdge({
     <>
       <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
       {label && (
-        <text
+        <foreignObject
           x={labelX}
           y={labelY}
-          style={{
-            fontSize: 12,
-            fill: 'black',
-            textAnchor: 'middle',
-            dominantBaseline: 'central',
-            ...labelStyle,
-          }}
+          width={1000} // max width to prevent clipping
+          height={40}
+          style={{ overflow: 'visible' }}
         >
-          {label}
-        </text>
+          <div
+            xmlns="http://www.w3.org/1999/xhtml"
+            style={{
+              display: 'inline-block',
+              whiteSpace: 'nowrap',
+              backgroundColor: '#E6F4E6',
+              color: 'black',
+              height: '30px',
+              lineHeight: '30px',
+              borderRadius: 4,
+              padding: '2px 6px',
+              fontSize: 12,
+              textAlign: 'center',
+              transform: 'translate(-50%, -50%)',
+              ...labelStyle
+            }}
+          >
+            {label}
+          </div>
+        </foreignObject>
       )}
     </>
   );
