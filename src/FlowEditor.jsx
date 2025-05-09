@@ -9,7 +9,8 @@ import {
   Controls,
   ReactFlowProvider,
   Background,
-  MarkerType
+  MarkerType,
+  ViewportPortal
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
@@ -50,8 +51,8 @@ function getStateDependenceFrame(nodes, edges) {
       varsInRate = [];
     }
 
-    const midX = ((fromNode.position.x + toNode.position.x) / 2).toFixed(1);
-    const midY = ((fromNode.position.y + toNode.position.y) / 2).toFixed(1);
+    const midX = ((fromNode.position.x + toNode.position.x) / 2) + 30;
+    const midY = ((fromNode.position.y + toNode.position.y) / 2) + 15;
 
     for (const v of varsInRate) {
       if (compartments.has(v)) {
@@ -60,8 +61,8 @@ function getStateDependenceFrame(nodes, edges) {
           rows.push({
             state: v,
             flow: flowName,
-            stateX: stateNode.position.x.toFixed(1),
-            stateY: stateNode.position.y.toFixed(1),
+            stateX: stateNode.position.x + 30,
+            stateY: stateNode.position.y + 15,
             flowX: midX,
             flowY: midY,
           });
@@ -223,6 +224,54 @@ function FlowEditor() {
           >
             <Controls />
             <Background />
+            <ViewportPortal>
+              <svg
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                  top: 0,
+                  left: 0,
+                }}
+              >
+                {stateFrame.map((row, i) => {
+                  const sx = row.stateX; //parseFloat(row.stateX);
+                  const sy = row.stateY; //parseFloat(row.stateY);
+                  const fx = row.flowX; //parseFloat(row.flowX);
+                  const fy = row.flowY; //parseFloat(row.flowY);
+
+                  return (
+                    <g key={i}>
+                      {/* state position marker */}
+                      <circle cx={sx} cy={sy} r={4} fill="red" />
+                      <text x={sx + 5} y={sy - 5} fontSize={10} fill="red">
+                        {row.state}
+                      </text>
+
+                      {/* flow position marker */}
+                      <circle cx={fx} cy={fy} r={4} fill="blue" />
+                      <text x={fx + 5} y={fy - 5} fontSize={10} fill="blue">
+                        {row.flow}
+                      </text>
+
+                      {/* dashed line between them */}
+                      <line
+                        x1={sx}
+                        y1={sy}
+                        x2={fx}
+                        y2={fy}
+                        stroke="gray"
+                        strokeWidth={1}
+                        strokeDasharray="4 2"
+                      />
+                    </g>
+                  );
+                })}
+              </svg>
+            </ViewportPortal>
+
+
           </ReactFlow>
         </ReactFlowProvider>
       </div>
@@ -271,41 +320,3 @@ function FlowEditor() {
 }
 
 export default FlowEditor;
-
-
-function DashedLinesOverlay({ stateFrame }) {
-  return (
-    <svg
-      style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        top: 0,
-        left: 0,
-      }}
-    >
-      {stateFrame.map((row, i) => {
-        const x1 = parseFloat(row.stateX);
-        const y1 = parseFloat(row.stateY);
-        const x2 = parseFloat(row.flowX);
-        const y2 = parseFloat(row.flowY);
-
-        if ([x1, y1, x2, y2].some(isNaN)) return null;
-
-        return (
-          <line
-            key={`line-${i}`}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            stroke="gray"
-            strokeWidth={1}
-            strokeDasharray="4 2"
-          />
-        );
-      })}
-    </svg>
-  );
-}
