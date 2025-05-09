@@ -6,7 +6,7 @@ Prototype visual builder for compartmental models using [React Flow](https://rea
 
 [https://canmod.github.io/macpan2-model-builder/](https://canmod.github.io/macpan2-model-builder/)
 
-## Usage
+## Run Development Version Locally
 
 ```bash
 npm install
